@@ -47,6 +47,8 @@ private:
 	void value_num_map_init();
 
 
+
+
 public:
 	// 数据库对象
 	QSqlDatabase db;
@@ -86,7 +88,7 @@ struct DETECT_INFO_INSERT
 							// 可以调用JS_DATABASE的静态成员函数get_timestamp_now获取格式为2020/08/29 16:59:28的时间戳
 	bool is_ng;				// 是否NG标识位（任意一个检测算子检出为NG则该元件NG标识为true）
 	QString ng_type;		// 元件需检查的缺陷类型标识字串，由字符'0'，'1'组成，长度与缺陷数量一致，暂定为24
-	QString ng_triger;		// 元件检出有NG对应缺陷的标识字串，由字符'0'，'1'组成，长度与缺陷数量一致，暂定为24
+	QString ng_trigger;		// 元件检出有NG对应缺陷的标识字串，由字符'0'，'1'组成，长度与缺陷数量一致，暂定为24
 	QString pic_path;		// 结果图存储的路径（路径分隔符为4个倒斜杠'\\\\'，示例："D:\\\\test\\\\pic\\\\test.bmp"）
 	int loc_x;				// 结果图在整板图中的左上角点x坐标
 	int loc_y;				// 结果图在整板图中的左上角点y坐标
@@ -100,7 +102,7 @@ struct DETECT_INFO_REQUIRE
 {
 	QString ele_name;		// 元件名
 	bool b_isNG;			// 结果图的NG判定结果
-	QString ng_triger;		// 元件检出NG的标识字串
+	QString ng_trigger;		// 元件检出NG的标识字串
 	std::string pic_path;	// 结果图存储的路径
 	int loc_x;				// 结果图在整板图中的左上角点x坐标
 	int loc_y;				// 结果图在整板图中的左上角点y坐标

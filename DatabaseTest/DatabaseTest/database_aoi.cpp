@@ -86,17 +86,17 @@ bool JS_DATABASE::insert_detect_result(DETECT_INFO_INSERT& result_info)
 
 	// 1.执行操作前对输入值的有效性进行判断
 
-	// 1.1 ng_type与ng_triger的长度应该与map一致
-	if (result_info.ng_type.size() != defect_index_map.size() || result_info.ng_triger.size() != defect_index_map.size())
+	// 1.1 ng_type与ng_trigger的长度应该与map一致
+	if (result_info.ng_type.size() != defect_index_map.size() || result_info.ng_trigger.size() != defect_index_map.size())
 	{
-		qDebug() << "Insert failed! The length of ng_type or ng_triger is wrong!";
+		qDebug() << "Insert failed! The length of ng_type or ng_trigger is wrong!";
 		return false;
 	}
 
-	// 1.2 ng_type与ng_triger应该只包含0和1
-	if (result_info.ng_type.contains(QRegExp("[^0,1]")) || result_info.ng_triger.contains(QRegExp("[^0,1]")))
+	// 1.2 ng_type与ng_trigger应该只包含0和1
+	if (result_info.ng_type.contains(QRegExp("[^0,1]")) || result_info.ng_trigger.contains(QRegExp("[^0,1]")))
 	{
-		qDebug() << "Insert failed! The content of ng_type or ng_triger should be only 0 or 1!";
+		qDebug() << "Insert failed! The content of ng_type or ng_trigger should be only 0 or 1!";
 		return false;
 	}
 
@@ -139,8 +139,8 @@ bool JS_DATABASE::insert_detect_result(DETECT_INFO_INSERT& result_info)
 	sql += "'" + result_info.ele_name + "', ";
 	sql += result_info.is_ng ? "1, " : "0, ";
 	sql += "'" + result_info.ng_type + "', ";
-	sql += "'" + result_info.ng_triger + "', ";
-	sql += "'" + result_info.pic_path + "', ";
+	sql += "'" + result_info.ng_trigger + "', ";
+	sql += "'" + result_info.pic_path + "', "; 
 	sql += QString::number(result_info.loc_x) + ", ";
 	sql += QString::number(result_info.loc_y) + ", ";
 	sql += QString::number(result_info.width) + ", ";
@@ -171,7 +171,7 @@ bool JS_DATABASE::insert_detect_result(DETECT_INFO_INSERT& result_info)
 		sql_tmp += "'" + result_info.board_name + "', ";
 		sql_tmp += "'" + result_info.ele_index + "', ";
 		sql_tmp += "'" + result_info.timestamp + "', ";
-		sql_tmp += result_info.ng_triger[vec_ng_needcheck_index[i]] == "1" ? "1, " : "0, ";
+		sql_tmp += result_info.ng_trigger[vec_ng_needcheck_index[i]] == "1" ? "1, " : "0, ";
 
 		// 判断该缺陷的输出信息是否为多个（如果有多个则按','分隔，因此直接判断有无字符','确认是否为多输出值）
 		if (result_info.vec_values[i].contains(QRegExp("[,]")))
@@ -259,7 +259,7 @@ bool JS_DATABASE::inquire_detect_result(QString timestamp, QString board, QStrin
 	result.pic_path = std_path;
 	result.ele_name = query.value("ele_name").toString();
 	result.b_isNG = query.value("is_ng").toInt() == 1 ? 1 : 0;
-	result.ng_triger = query.value("ng_triger").toString();
+	result.ng_trigger = query.value("ng_trigger").toString();
 	result.loc_x = query.value("loc_x").toInt();
 	result.loc_y = query.value("loc_y").toInt();
 	result.width = query.value("width").toInt();
@@ -356,8 +356,8 @@ bool JS_DATABASE::truncate_table(QString table_name)
 // 获取时间戳函数 格式示例：2020/08/29 16:59:28
 QString JS_DATABASE::get_timestamp_now()
 {
-	time_t curtime = time(NULL);
-	tm *ptm = localtime(&curtime);
+	time_t currentTime = time(NULL);
+	tm *ptm = localtime(&currentTime);
 	char buf[20];
 	sprintf(buf, "%d-%02d-%02d %02d:%02d:%02d", ptm->tm_year + 1900, ptm->tm_mon + 1, ptm->tm_mday, ptm->tm_hour, ptm->tm_min, ptm->tm_sec);
 	QString time(buf);

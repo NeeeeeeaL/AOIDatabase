@@ -18,10 +18,12 @@ int main(int argc, char *argv[])
 	QString database_name = "aoi";			// 目标数据库名称
 	JS_DATABASE aoi_db(connection_name, host_IP, user_name, passward, database_name);
 
+	//数据库插入结果返回值
+	bool isOK;
+
 	// 建立数据库连接
-	bool isOK = aoi_db.connect();
-	if (isOK)
-		qDebug() << "connect database" << database_name << "success!";
+	if (aoi_db.connect())
+		qDebug() << "connect database" << database_name << "successfully!";
 
 	// 插入一条数据
 	DETECT_INFO_INSERT info1;
@@ -31,7 +33,7 @@ int main(int argc, char *argv[])
 	info1.timestamp = JS_DATABASE::get_timestamp_now();
 	info1.is_ng = true;
 	info1.ng_type = "111100000000000000000000";
-	info1.ng_triger = "000000000000000000000000";
+	info1.ng_trigger = "000000000000000000000000";
 	info1.pic_path = "D:\\\\test\\\\pic\\\\test.bmp";
 	info1.loc_x = 10;
 	info1.loc_y = 10;

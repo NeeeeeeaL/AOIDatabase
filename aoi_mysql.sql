@@ -2,7 +2,7 @@ use aoi;
 -- 创建主表`production_result`
 create table if not exists `production_result` (`id` bigint unsigned not null auto_increment primary key, `board` varchar(50), 
 	`ele_index` varchar(30), `timestamp` datetime, `ele_name` varchar(30), `is_ng` tinyint(1), `ng_type` varchar(80),
-	`ng_triger` varchar(80),  `pic_path` varchar(100), `loc_x` mediumint, `loc_y` mediumint, `width` mediumint, `height` mediumint,
+	`ng_trigger` varchar(80),  `pic_path` varchar(100), `loc_x` mediumint, `loc_y` mediumint, `width` mediumint, `height` mediumint,
 	index `search_index`(`timestamp`, `board`, `ele_index`));
 -- alter table `production_result` add index search_index(`timestamp`, `board`, `ele_index`);
 -- 算子分表00-末端突出
