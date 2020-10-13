@@ -19,9 +19,6 @@ public:
 	// 构造函数
 	JS_DATABASE(QString connection_name, QString host_IP, QString user_name, QString passward, QString database_name);
 
-	//空构造函数
-	JS_DATABASE();
-
 	// 析构函数
 	~JS_DATABASE();
 

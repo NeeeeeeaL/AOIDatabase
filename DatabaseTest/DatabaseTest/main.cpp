@@ -70,6 +70,12 @@ int main(int argc, char *argv[])
 	std::vector<QString> subTables;
 	subTables = aoi_db.findDefectsTables(defectsToDetect);
 
+	qDebug() << "subTables.size() = " << subTables.size() << endl;
+
+	for (int i = 0; i < subTables.size(); ++i)
+	{
+		qDebug() << "subTables[" << i << "] = " << subTables[i] ;
+	}
 
     return a.exec();
 }
