@@ -36,6 +36,7 @@ JS_DATABASE::JS_DATABASE(QString connection_name, QString host_IP, QString user_
 	this->is_driver_valid = this->db.isValid();
 }
 
+
 // 析构函数
 JS_DATABASE::~JS_DATABASE()
 {
@@ -72,6 +73,43 @@ bool JS_DATABASE::connect()
 
 	this->is_connected = true;
 	return true;
+}
+
+//根据要检查的缺陷定位选择要使用的分表
+std::vector<QString> JS_DATABASE::findDefectsTables(QString str)
+{
+	std::vector<QString> targetTables;
+	for (int i = 0; i < str.size(); ++i)
+	{
+		if (str[i] == 1)
+			targetTables.push_back(defect_index_map[i]);
+	}
+
+	return targetTables;
+}
+
+//查询元器件要检查的缺陷类型
+QString JS_DATABASE::findDefectsToDetect(QString ele_name)
+{
+	//首先判断数据库对象是否已经连接
+	//if (!is_connected)
+	//{
+	//	qDebug() << "The database is disconnected! Please connect first!";
+	//	return -1;//数据库未连接错误码
+	//}
+
+	//从主表中查询该元件的应该检测的缺陷类型的字符串
+	QSqlQuery query(this->db);
+	QString sql;
+
+	sql = "select ng_type from `production_result` where `ele_name` = '";
+	sql += ele_name;
+	sql += "'";
+
+	query.exec(sql);
+	query.next();
+
+	return query.value("ng_type").toString();
 }
 
 // 插入结果数据

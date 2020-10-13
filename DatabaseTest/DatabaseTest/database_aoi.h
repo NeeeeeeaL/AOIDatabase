@@ -19,12 +19,21 @@ public:
 	// 构造函数
 	JS_DATABASE(QString connection_name, QString host_IP, QString user_name, QString passward, QString database_name);
 
+	//空构造函数
+	JS_DATABASE();
+
 	// 析构函数
 	~JS_DATABASE();
 
 public:
 	// 建立数据库连接
 	bool connect();
+
+	//根据要检查的缺陷类型查询分表
+	std::vector<QString> findDefectsTables(QString str);
+
+	//查询元器件要检查的缺陷类型
+	QString findDefectsToDetect(QString );
 
 	// 插入结果数据
 	bool insert_detect_result(DETECT_INFO_INSERT& result_info);
@@ -103,6 +112,7 @@ struct DETECT_INFO_REQUIRE
 	QString ele_name;		// 元件名
 	bool b_isNG;			// 结果图的NG判定结果
 	QString ng_trigger;		// 元件检出NG的标识字串
+	QString ng_type;		// 元件需检查的缺陷类型标识字串，由字符'0'，'1'组成，长度与缺陷数量一致，暂定为24
 	std::string pic_path;	// 结果图存储的路径
 	int loc_x;				// 结果图在整板图中的左上角点x坐标
 	int loc_y;				// 结果图在整板图中的左上角点y坐标
