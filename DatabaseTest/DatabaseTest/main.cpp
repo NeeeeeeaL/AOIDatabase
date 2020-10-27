@@ -59,16 +59,13 @@ int main(int argc, char *argv[])
 	qDebug() << "finish!";
 
 	//根据元件名查询要检查的缺陷
-	QString name = "pc1";
-
-	QString defectsToDetect;
-	defectsToDetect = aoi_db.findDefectsToDetect(name);
-
-	qDebug() << "defectsToDetect = " << defectsToDetect << endl;
-
-	//根据要检查的缺陷查询分表
+	QString eleName = "pc1";
 	std::vector<QString> subTables;
-	subTables = aoi_db.findDefectsTables(defectsToDetect);
+
+	subTables = aoi_db.findDefectsToDetect(eleName);
+	bool ismatch = aoi_db.matchTableIndex("production_esult", 14, "board3");
+
+	qDebug() << "isRename = " << ismatch << endl;
 
 	qDebug() << "subTables.size() = " << subTables.size() << endl;
 

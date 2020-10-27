@@ -8,12 +8,15 @@
 #include <QDateTime>
 #include <QTextCodec>
 #include <QBitArray>
+#include <assert.h> //程序出错，终止程序执行的头文件
 
 #include <stdio.h>
 #include <time.h>
 #include <ctime>
 
 #include "database_aoi.h"
+
+#define cout qDebug() << "[" << __FILE__ << ":" << __LINE__ << "; Func:" << __func__ <<"]"
 
 // 构造函数
 JS_DATABASE::JS_DATABASE(QString connection_name, QString host_IP, QString user_name, QString passward, QString database_name)
@@ -75,15 +78,13 @@ bool JS_DATABASE::connect()
 	return true;
 }
 
-//1.查询元器件要检查的缺陷类型
-QString JS_DATABASE::findDefectsToDetect(QString ele_name)
+
+std::vector<QString> JS_DATABASE::findDefectsToDetect(QString ele_name)
 {
+	//1.查询元器件要检查的缺陷类型
+
 	//首先判断数据库对象是否已经连接
-	if (!is_connected)
-	{
-		qDebug() << "The database is disconnected! Please connect first!";
-		return -1;//数据库未连接错误码
-	}
+	assert(is_connected); //数据库未连接时终止程序 
 
 	//从主表中查询该元件的应该检测的缺陷类型的字符串
 	QSqlQuery query(this->db);
@@ -96,22 +97,21 @@ QString JS_DATABASE::findDefectsToDetect(QString ele_name)
 	query.exec(sql);
 	query.next();
 
-	return query.value("ng_type").toString();
-}
+	QString ngType = query.value("ng_type").toString();
 
-//2.根据要检查的缺陷定位选择要使用的分表
-std::vector<QString> JS_DATABASE::findDefectsTables(QString str)
-{
+	cout << "ngType = " << ngType << endl;
+
+	//2.根据要检查的缺陷定位选择要使用的分表
 	std::vector<QString> targetTables;
-	for (int i = 0; i < str.size(); ++i)
+
+	for (int i = 0; i < ngType.size(); ++i)
 	{
-		if (str[i] == "1")
+		if (ngType[i] == "1")
 			targetTables.push_back(defect_index_map[i]);
 	}
 
 	return targetTables;
 }
-
 
 
 // 插入结果数据
@@ -392,6 +392,179 @@ bool JS_DATABASE::truncate_table(QString table_name)
 	}
 	return true;
 }
+
+//查询数据数据库中是否有特定表
+bool JS_DATABASE::findTable(QString tableNmae)
+{
+	//首先判断数据库对象是否已经连接
+	assert(is_connected); //数据库未连接时终止程序 
+
+	QSqlQuery query(this->db);
+	QString sql;
+
+	sql = "select count(*) from information_schema.tables where table_schema = 'aoi' and table_name = '";
+	sql += tableNmae;
+	sql += "'";
+
+	query.exec(sql);
+	query.next();
+
+	if (query.value(0).toInt()) //查询到表返回1，未查询到返回0
+		return true;
+	else
+		return false;
+}
+
+
+//重命名特定表
+bool JS_DATABASE::renameTable(QString originalName, QString newName)
+{
+	//首先判断数据库对象是否已经连接
+	assert(is_connected); //数据库未连接时终止程序 
+
+	//判断是否有该表
+	if (findTable(originalName))
+	{
+		QSqlQuery query(this->db);
+		QString sql;
+
+		sql = "rename table " + originalName + " to " + newName;
+
+		if (query.exec(sql))
+			return true;
+		else
+		{
+			qDebug() << "Rename table failed! The reason is" << this->db.lastError().text();
+			return false;
+		}
+	}
+	else
+	{
+		qDebug() << "The table " << originalName << " does not exist!";
+		return false;
+	}
+
+}
+
+//删除特定表
+bool JS_DATABASE::dropTable(QString tableName)
+{
+	//首先判断数据库对象是否已经连接
+	assert(is_connected); //数据库未连接时终止程序 
+
+	//判断是否有该表
+	if (findTable(tableName))
+	{
+		QSqlQuery query(this->db);
+		QString sql;
+
+		sql = "drop table " + tableName;
+
+		if (query.exec(sql))
+			return true;
+		else
+		{
+			qDebug() << "DropTable failed! The reason is" << this->db.lastError().text();
+			return false;
+		}
+	}
+	else
+	{
+		qDebug() << "The table " << tableName << " does not exist!";
+		return false;
+	}
+
+	
+}
+
+//创建特定表
+bool JS_DATABASE::createTable(QString tableName)
+{
+	//首先判断数据库对象是否已经连接
+	assert(is_connected); //数据库未连接时终止程序 
+
+	//先判断此表是否存在
+	if (!findTable(tableName))
+	{
+		QSqlQuery query(this->db);
+		QString sql;
+
+		sql = "create table " + tableName + " (id serial, content varchar(8000) not null,`desc` varchar(100) not null) engine innodb";
+
+		if (query.exec(sql))
+			return true;
+		else
+		{
+			qDebug() << "createTable failed! The reason is" << this->db.lastError().text();
+			return false;
+		}
+	}
+	else
+	{
+		qDebug() << "The table " << tableName << " already exits!";
+		return false;
+	}
+
+	
+}
+
+bool JS_DATABASE::matchTableIndex(QString tableName, int colIndex, QString str)
+{
+	//首先判断数据库对象是否已经连接
+	assert(is_connected); //数据库未连接时终止程序 
+	
+	//判断是否有此数据表
+	if(findTable(tableName))
+	{
+		QString colName; //存放查询到的字段名
+		QSqlQuery query(this->db);
+		QString sql1;
+		QString sql2;
+
+		//查询字段名
+		sql1 = "select column_name from information_schema.columns where table_schema = 'aoi' and table_name = '";
+		sql1 += tableName;
+		sql1 += "' and ordinal_position = '";
+		sql1 += QString::number(colIndex);
+		sql1 += "'";
+
+		if (query.exec(sql1))
+		{
+			if (query.next())
+				colName = query.value(0).toString();
+		}
+		else
+		{
+			qDebug() << "Search colName failed! The reason is" << this->db.lastError().text();
+			return false;
+		}
+
+		//查询字段下有没有str
+		sql2 = "select count(*) from " + tableName + " where " + colName + " = '" + str + "'";
+		if (query.exec(sql2))
+		{
+			query.next();
+			if (query.value(0).toInt()) //返回查询到的数量
+				return true;
+			else
+				return false;
+		}
+		else
+		{
+			qDebug() << "Martch str failed! The reason is" << this->db.lastError().text();
+			return false;
+		}
+
+	}
+	else
+	{
+		qDebug() << "The table " << tableName << " does not exist!";
+		return false;
+	}
+
+}
+
+
 
 // 获取时间戳函数 格式示例：2020/08/29 16:59:28
 QString JS_DATABASE::get_timestamp_now()

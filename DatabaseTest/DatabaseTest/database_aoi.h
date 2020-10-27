@@ -26,11 +26,8 @@ public:
 	// 建立数据库连接
 	bool connect();
 
-	//根据要检查的缺陷类型查询分表
-	std::vector<QString> findDefectsTables(QString str);
-
 	//查询元器件要检查的缺陷类型
-	QString findDefectsToDetect(QString );
+	std::vector<QString> findDefectsToDetect(QString );
 
 	// 插入结果数据
 	bool insert_detect_result(DETECT_INFO_INSERT& result_info);
@@ -40,6 +37,22 @@ public:
 
 	// 清空指定的数据表
 	bool truncate_table(QString table_name);
+
+	//查询数据数据库中是否有特定表
+	bool findTable(QString);
+
+	//重命名特定表
+	bool renameTable(QString, QString);
+
+	//删除特定表
+	bool dropTable(QString);
+
+	//创建特定表
+	bool createTable(QString);
+
+	//查询表名A下第X列内是否有数据与输入的字符STR相等
+	bool matchTableIndex(QString, int, QString );
+
 
 public:
 	// 获取时间戳函数 示例：2020/08/29 16:59:28
