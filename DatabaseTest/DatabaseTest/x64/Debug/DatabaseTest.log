@@ -1,3 +1,5 @@
 ﻿  database_aoi.cpp
+c:\users\administrator\desktop\aoi数据库\databasetest\databasetest\database_aoi.cpp(866): warning C4715: “JS_DATABASE::loadFromDB”: 不是所有的控件路径都返回值
+c:\users\administrator\desktop\aoi数据库\databasetest\databasetest\database_aoi.cpp(814): warning C4715: “JS_DATABASE::saveToDB”: 不是所有的控件路径都返回值
   DatabaseTest.vcxproj -> C:\Users\Administrator\Desktop\AOI数据库\DatabaseTest\x64\Debug\DatabaseTest.exe
   DatabaseTest.vcxproj -> C:\Users\Administrator\Desktop\AOI数据库\DatabaseTest\x64\Debug\DatabaseTest.pdb (Full PDB)

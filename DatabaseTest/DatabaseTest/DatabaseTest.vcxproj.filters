@@ -26,9 +26,15 @@
     <ClCompile Include="database_aoi.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="csvRW.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="database_aoi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="csvRW.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

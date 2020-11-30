@@ -1,132 +1,195 @@
-#pragma once
+ï»¿#pragma once
 #include <QString>
 #include <QSqlDatabase>
 #include <map>
 #include <string>
 #include <vector>
+#include <QHash>
 
-// ²åÈëÔª¼ş¼ì²â½á¹ûÊ±´«ÈëµÄ½á¹¹Ìå
+// æ’å…¥å…ƒä»¶æ£€æµ‹ç»“æœæ—¶ä¼ å…¥çš„ç»“æ„ä½“
 struct DETECT_INFO_INSERT;
 
-// ²éÑ¯Ôª¼ş¼ì²â½á¹ûÊ±´«³öµÄ½á¹¹Ìå
+// æŸ¥è¯¢å…ƒä»¶æ£€æµ‹ç»“æœæ—¶ä¼ å‡ºçš„ç»“æ„ä½“
 struct DETECT_INFO_REQUIRE;
 
+//ç¼ºé™·ä¿¡æ¯ç»“æ„ä½“
+struct ErrorInfo;
 
-// AOIÏîÄ¿Êı¾İ¿âÀà
+//å…ƒä»¶ä¿¡æ¯ç»“æ„ä½“
+struct SMTInfo;
+
+
+// AOIé¡¹ç›®æ•°æ®åº“ç±»
 class JS_DATABASE
 {
 public:
-	// ¹¹Ôìº¯Êı
+	// æ„é€ å‡½æ•°
 	JS_DATABASE(QString connection_name, QString host_IP, QString user_name, QString passward, QString database_name);
 
-	// Îö¹¹º¯Êı
+	// ææ„å‡½æ•°
 	~JS_DATABASE();
 
 public:
-	// ½¨Á¢Êı¾İ¿âÁ¬½Ó
+	// å»ºç«‹æ•°æ®åº“è¿æ¥
 	bool connect();
 
-	//²éÑ¯ÔªÆ÷¼şÒª¼ì²éµÄÈ±ÏİÀàĞÍ
+	//æŸ¥è¯¢å…ƒå™¨ä»¶è¦æ£€æŸ¥çš„ç¼ºé™·ç±»å‹
 	std::vector<QString> findDefectsToDetect(QString );
 
-	// ²åÈë½á¹ûÊı¾İ
+	// æ’å…¥ç»“æœæ•°æ®
 	bool insert_detect_result(DETECT_INFO_INSERT& result_info);
 
-	// ²éÑ¯¾ßÌåÊ±¼ä´ÁÏÂ£¬Ä³¿é°åµÄÄ³¸öÔª¼ş¼ì²â½á¹ûĞÅÏ¢
+	// æŸ¥è¯¢å…·ä½“æ—¶é—´æˆ³ä¸‹ï¼ŒæŸå—æ¿çš„æŸä¸ªå…ƒä»¶æ£€æµ‹ç»“æœä¿¡æ¯
 	bool inquire_detect_result(QString timestamp, QString board, QString ele_index, DETECT_INFO_REQUIRE& result_info);
 
-	// Çå¿ÕÖ¸¶¨µÄÊı¾İ±í
+	// æ¸…ç©ºæŒ‡å®šçš„æ•°æ®è¡¨
 	bool truncate_table(QString table_name);
 
-	//²éÑ¯Êı¾İÊı¾İ¿âÖĞÊÇ·ñÓĞÌØ¶¨±í
+	//æŸ¥è¯¢æ•°æ®æ•°æ®åº“ä¸­æ˜¯å¦æœ‰ç‰¹å®šè¡¨
 	bool findTable(QString);
 
-	//ÖØÃüÃûÌØ¶¨±í
+	//é‡å‘½åç‰¹å®šè¡¨
 	bool renameTable(QString, QString);
 
-	//É¾³ıÌØ¶¨±í
+	//åˆ é™¤ç‰¹å®šè¡¨
 	bool dropTable(QString);
 
-	//´´½¨ÌØ¶¨±í
+	//åˆ›å»ºç‰¹å®šè¡¨
 	bool createTable(QString);
 
-	//²éÑ¯±íÃûAÏÂµÚXÁĞÄÚÊÇ·ñÓĞÊı¾İÓëÊäÈëµÄ×Ö·ûSTRÏàµÈ
-	bool matchTableIndex(QString, int, QString );
+	//æŸ¥è¯¢è¡¨åAä¸‹ç¬¬Xåˆ—å†…æ˜¯å¦æœ‰æ•°æ®ä¸è¾“å…¥çš„å­—ç¬¦STRç›¸ç­‰
+	int matchTableIndex(QString, int, QString );
+
+	//ç”¨æˆ·ç™»å½•éªŒè¯
+	int usersLogin(QString, QString);
+
+	//æŸ¥è¯¢æ—¶é—´æµ‹è¯•
+	int timeCost();
 
 
 public:
-	// »ñÈ¡Ê±¼ä´Áº¯Êı Ê¾Àı£º2020/08/29 16:59:28
+	// è·å–æ—¶é—´æˆ³å‡½æ•° ç¤ºä¾‹ï¼š2020/08/29 16:59:28
 	static QString get_timestamp_now();
 
 private:
-	// ¼ì²âËã×Ó¶ÔÓ¦±íÃûµÄË÷Òımap³õÊ¼»¯
+	// æ£€æµ‹ç®—å­å¯¹åº”è¡¨åçš„ç´¢å¼•mapåˆå§‹åŒ–
 	void defect_index_map_init();
 
-	// ¼ì²âËã×Ó¶ÔÓ¦Êä³öÖµÊıÁ¿µÄmap³õÊ¼»¯
+	// æ£€æµ‹ç®—å­å¯¹åº”è¾“å‡ºå€¼æ•°é‡çš„mapåˆå§‹åŒ–
 	void value_num_map_init();
 
 
 
 
 public:
-	// Êı¾İ¿â¶ÔÏó
+	// æ•°æ®åº“å¯¹è±¡
 	QSqlDatabase db;
-	// Êı¾İ¿âÁ¬½ÓÃû³Æ£¨×Ô¶¨Òå£¬ÓÃÓÚÇø·Ö£©
+	// æ•°æ®åº“è¿æ¥åç§°ï¼ˆè‡ªå®šä¹‰ï¼Œç”¨äºåŒºåˆ†ï¼‰
 	QString connection_name;
-	// Ä¿±êÊı¾İ¿âËùÊôÖ÷»úIP
+	// ç›®æ ‡æ•°æ®åº“æ‰€å±ä¸»æœºIP
 	QString host_IP;
-	// µÇÂ¼Ä¿±êÊı¾İ¿âÊ±µÄÓÃ»§Ãû
+	// ç™»å½•ç›®æ ‡æ•°æ®åº“æ—¶çš„ç”¨æˆ·å
 	QString user_name;
-	// µÇÂ¼ÃÜÂë
+	// ç™»å½•å¯†ç 
 	QString passward;
-	// Ä¿±êÊı¾İ¿âÃû³Æ
+	// ç›®æ ‡æ•°æ®åº“åç§°
 	QString database_name;
+
+	//å‘æ•°æ®åº“å­˜æ•°æ®
+	bool saveToDB(QString, SMTInfo*, QHash<QString, QString>);
+	//ä»æ•°æ®åº“ä¸­å–æ•°æ®
+	bool loadFromDB(QString, SMTInfo*, QHash<QString, QString>);
+
 
 
 private:
-	// ¼ì²âËã×Ó¶ÔÓ¦±íÃûµÄË÷Òımap
+	// æ£€æµ‹ç®—å­å¯¹åº”è¡¨åçš„ç´¢å¼•map
 	std::map<int, QString> defect_index_map;
-	// ¼ì²âËã×Ó¶ÔÓ¦Êä³öÖµÊıÁ¿µÄmap
+	// æ£€æµ‹ç®—å­å¯¹åº”è¾“å‡ºå€¼æ•°é‡çš„map
 	std::map<int, int> value_num_map;
 
 private:
-	// ±êÊ¶Êı¾İ¿âÇı¶¯ÊÇ·ñÓĞĞ§
+	// æ ‡è¯†æ•°æ®åº“é©±åŠ¨æ˜¯å¦æœ‰æ•ˆ
 	bool is_driver_valid = false;
-	// ±êÊ¶Êı¾İ¿âÊÇ·ñÒÑ¾­Á¬½Ó
+	// æ ‡è¯†æ•°æ®åº“æ˜¯å¦å·²ç»è¿æ¥
 	bool is_connected = false;
 
 };
 
-// ²åÈëÔª¼ş¼ì²â½á¹ûÊ±´«ÈëµÄ½á¹¹Ìå
+// æ’å…¥å…ƒä»¶æ£€æµ‹ç»“æœæ—¶ä¼ å…¥çš„ç»“æ„ä½“
 struct DETECT_INFO_INSERT
 {
-	QString board_name;		// boom°åÃû³Æ£¨Ã¿¿é°åµÄÎ¨Ò»±êÊ¶£©
-	QString ele_name;		// Ôª¼şÃû
-	QString ele_index;		// Ôª¼ş±àÂë£¨Ã¿¿é°åÉÏµÄÃ¿¸öÔª¼şµÄÎ¨Ò»±êÊ¶£©
-	QString timestamp;		// Ê±¼ä´Á£¨ÈıÖÖ¸ñÊ½: 2020/08/29 16:59:28 || 2020-08-29 16:59:28 || 20200829165928£©
-							// ¿ÉÒÔµ÷ÓÃJS_DATABASEµÄ¾²Ì¬³ÉÔ±º¯Êıget_timestamp_now»ñÈ¡¸ñÊ½Îª2020/08/29 16:59:28µÄÊ±¼ä´Á
-	bool is_ng;				// ÊÇ·ñNG±êÊ¶Î»£¨ÈÎÒâÒ»¸ö¼ì²âËã×Ó¼ì³öÎªNGÔò¸ÃÔª¼şNG±êÊ¶Îªtrue£©
-	QString ng_type;		// Ôª¼şĞè¼ì²éµÄÈ±ÏİÀàĞÍ±êÊ¶×Ö´®£¬ÓÉ×Ö·û'0'£¬'1'×é³É£¬³¤¶ÈÓëÈ±ÏİÊıÁ¿Ò»ÖÂ£¬Ôİ¶¨Îª24
-	QString ng_trigger;		// Ôª¼ş¼ì³öÓĞNG¶ÔÓ¦È±ÏİµÄ±êÊ¶×Ö´®£¬ÓÉ×Ö·û'0'£¬'1'×é³É£¬³¤¶ÈÓëÈ±ÏİÊıÁ¿Ò»ÖÂ£¬Ôİ¶¨Îª24
-	QString pic_path;		// ½á¹ûÍ¼´æ´¢µÄÂ·¾¶£¨Â·¾¶·Ö¸ô·ûÎª4¸öµ¹Ğ±¸Ü'\\\\'£¬Ê¾Àı£º"D:\\\\test\\\\pic\\\\test.bmp"£©
-	int loc_x;				// ½á¹ûÍ¼ÔÚÕû°åÍ¼ÖĞµÄ×óÉÏ½Çµãx×ø±ê
-	int loc_y;				// ½á¹ûÍ¼ÔÚÕû°åÍ¼ÖĞµÄ×óÉÏ½Çµãy×ø±ê
-	int width;				// ½á¹ûÍ¼µÄ¿í¶È
-	int height;				// ½á¹ûÍ¼µÄ¸ß¶È
-	std::vector<QString> vec_values;  // Ôª¼ş¾­Ëã×Ó¼ì²âµÄÊä³öÖµ£¨Êä³öÖµµÄÌí¼ÓË³ĞòÓ¦¸ÃÊÇng_typeÖĞ´Ó×óÍùÓÒÖÃ1Î»¶ÔÓ¦µÄ¼ì²âËã×ÓÊä³öÖµ£©
+	QString board_name;		// boomæ¿åç§°ï¼ˆæ¯å—æ¿çš„å”¯ä¸€æ ‡è¯†ï¼‰
+	QString ele_name;		// å…ƒä»¶å
+	QString ele_index;		// å…ƒä»¶ç¼–ç ï¼ˆæ¯å—æ¿ä¸Šçš„æ¯ä¸ªå…ƒä»¶çš„å”¯ä¸€æ ‡è¯†ï¼‰
+	QString timestamp;		// æ—¶é—´æˆ³ï¼ˆä¸‰ç§æ ¼å¼: 2020/08/29 16:59:28 || 2020-08-29 16:59:28 || 20200829165928ï¼‰
+							// å¯ä»¥è°ƒç”¨JS_DATABASEçš„é™æ€æˆå‘˜å‡½æ•°get_timestamp_nowè·å–æ ¼å¼ä¸º2020/08/29 16:59:28çš„æ—¶é—´æˆ³
+	bool is_ng;				// æ˜¯å¦NGæ ‡è¯†ä½ï¼ˆä»»æ„ä¸€ä¸ªæ£€æµ‹ç®—å­æ£€å‡ºä¸ºNGåˆ™è¯¥å…ƒä»¶NGæ ‡è¯†ä¸ºtrueï¼‰
+	QString ng_type;		// å…ƒä»¶éœ€æ£€æŸ¥çš„ç¼ºé™·ç±»å‹æ ‡è¯†å­—ä¸²ï¼Œç”±å­—ç¬¦'0'ï¼Œ'1'ç»„æˆï¼Œé•¿åº¦ä¸ç¼ºé™·æ•°é‡ä¸€è‡´ï¼Œæš‚å®šä¸º24
+	QString ng_trigger;		// å…ƒä»¶æ£€å‡ºæœ‰NGå¯¹åº”ç¼ºé™·çš„æ ‡è¯†å­—ä¸²ï¼Œç”±å­—ç¬¦'0'ï¼Œ'1'ç»„æˆï¼Œé•¿åº¦ä¸ç¼ºé™·æ•°é‡ä¸€è‡´ï¼Œæš‚å®šä¸º24
+	QString pic_path;		// ç»“æœå›¾å­˜å‚¨çš„è·¯å¾„ï¼ˆè·¯å¾„åˆ†éš”ç¬¦ä¸º4ä¸ªå€’æ–œæ '\\\\'ï¼Œç¤ºä¾‹ï¼š"D:\\\\test\\\\pic\\\\test.bmp"ï¼‰
+	int loc_x;				// ç»“æœå›¾åœ¨æ•´æ¿å›¾ä¸­çš„å·¦ä¸Šè§’ç‚¹xåæ ‡
+	int loc_y;				// ç»“æœå›¾åœ¨æ•´æ¿å›¾ä¸­çš„å·¦ä¸Šè§’ç‚¹yåæ ‡
+	int width;				// ç»“æœå›¾çš„å®½åº¦
+	int height;				// ç»“æœå›¾çš„é«˜åº¦
+	std::vector<QString> vec_values;  // å…ƒä»¶ç»ç®—å­æ£€æµ‹çš„è¾“å‡ºå€¼ï¼ˆè¾“å‡ºå€¼çš„æ·»åŠ é¡ºåºåº”è¯¥æ˜¯ng_typeä¸­ä»å·¦å¾€å³ç½®1ä½å¯¹åº”çš„æ£€æµ‹ç®—å­è¾“å‡ºå€¼ï¼‰
 };
 
-// ²éÑ¯Ôª¼ş¼ì²â½á¹ûÊ±´«³öµÄ½á¹¹Ìå
+// æŸ¥è¯¢å…ƒä»¶æ£€æµ‹ç»“æœæ—¶ä¼ å‡ºçš„ç»“æ„ä½“
 struct DETECT_INFO_REQUIRE
 {
-	QString ele_name;		// Ôª¼şÃû
-	bool b_isNG;			// ½á¹ûÍ¼µÄNGÅĞ¶¨½á¹û
-	QString ng_trigger;		// Ôª¼ş¼ì³öNGµÄ±êÊ¶×Ö´®
-	QString ng_type;		// Ôª¼şĞè¼ì²éµÄÈ±ÏİÀàĞÍ±êÊ¶×Ö´®£¬ÓÉ×Ö·û'0'£¬'1'×é³É£¬³¤¶ÈÓëÈ±ÏİÊıÁ¿Ò»ÖÂ£¬Ôİ¶¨Îª24
-	std::string pic_path;	// ½á¹ûÍ¼´æ´¢µÄÂ·¾¶
-	int loc_x;				// ½á¹ûÍ¼ÔÚÕû°åÍ¼ÖĞµÄ×óÉÏ½Çµãx×ø±ê
-	int loc_y;				// ½á¹ûÍ¼ÔÚÕû°åÍ¼ÖĞµÄ×óÉÏ½Çµãy×ø±ê
-	int width;				// ½á¹ûÍ¼µÄ¿í¶È
-	int height;				// ½á¹ûÍ¼µÄ¸ß¶È
-	std::map<int, QString> detect_value_map;  // ½øĞĞ¼ì²âµÄËã×ÓÊä³ö½á¹û
+	QString ele_name;		// å…ƒä»¶å
+	bool b_isNG;			// ç»“æœå›¾çš„NGåˆ¤å®šç»“æœ
+	QString ng_trigger;		// å…ƒä»¶æ£€å‡ºNGçš„æ ‡è¯†å­—ä¸²
+	QString ng_type;		// å…ƒä»¶éœ€æ£€æŸ¥çš„ç¼ºé™·ç±»å‹æ ‡è¯†å­—ä¸²ï¼Œç”±å­—ç¬¦'0'ï¼Œ'1'ç»„æˆï¼Œé•¿åº¦ä¸ç¼ºé™·æ•°é‡ä¸€è‡´ï¼Œæš‚å®šä¸º24
+	std::string pic_path;	// ç»“æœå›¾å­˜å‚¨çš„è·¯å¾„
+	int loc_x;				// ç»“æœå›¾åœ¨æ•´æ¿å›¾ä¸­çš„å·¦ä¸Šè§’ç‚¹xåæ ‡
+	int loc_y;				// ç»“æœå›¾åœ¨æ•´æ¿å›¾ä¸­çš„å·¦ä¸Šè§’ç‚¹yåæ ‡
+	int width;				// ç»“æœå›¾çš„å®½åº¦
+	int height;				// ç»“æœå›¾çš„é«˜åº¦
+	std::map<int, QString> detect_value_map;  // è¿›è¡Œæ£€æµ‹çš„ç®—å­è¾“å‡ºç»“æœ
+};
+
+
+//ç¼ºé™·ä¿¡æ¯ç»“æ„ä½“(åˆ†è¡¨ä¿¡æ¯)
+struct ErrorInfo
+{
+	int amount; //ç¼ºé™·å‚æ•°ä¸ªæ•°
+	QString name; //ç¼ºé™·åï¼ˆä¸­æ–‡ï¼‰
+	std::vector<int>error_team_num;//å‚æ•°åœ¨å„è‡ªæ•°ç»„ä¸­çš„åºå·
+	std::vector<QString>error_name;//å‚æ•°å
+	std::vector<int>error_num_type;//å°†æ•°æ®è¡¨å‚æ•°ç±»å‹æŒ‰å‚æ•°åœ¨æ•°æ®è¡¨ä¸­çš„é¡ºåºå­˜å‚¨åœ¨vectorä¸­
+	std::vector<int>type0_factor;//intå‚æ•°æ•°ç»„
+	std::vector<double>type1_factor;//
+	std::vector<QString>type2_factor;
+	std::vector<QString>type3_factor;
+	void Reset_this() 
+	{
+		this->name = "";
+		this->amount = 0;
+		this->error_team_num.clear();
+		this->error_name.clear();
+		this->error_num_type.clear();
+		this->type0_factor.clear();
+		this->type1_factor.clear();
+		this->type2_factor.clear();
+		this->type3_factor.clear();
+	}
+};
+
+
+//å…ƒä»¶ä¿¡æ¯ç»“æ„ä½“(æ€»è¡¨)
+struct SMTInfo 
+{
+	QString smt_name;
+	QString smt_code;
+	QString error_types;
+	QString img_path;
+	int smt_x;
+	int smt_y;
+	int smt_length;
+	int smt_width;
+	int smt_height;
+	int smt_angle;
+	ErrorInfo** ero;
 };

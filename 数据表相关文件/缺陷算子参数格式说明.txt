@@ -1,0 +1,20 @@
+[ERRORNAME1]（按缺陷顺序添加）
+NAME = 末端突出
+AMOUNT = 7
+FACTORNAME1 = 电极长度
+FACTORNAME2 = 电极宽度
+FACTORNAME3 = 判定阈值
+FACTORNAME4 = 电极名称
+FACTORNAME5 = 电极类型
+FACTORNAME6 = 电极HSV上边界
+FACTORNAME7 = 电极HSV下边界
+FACTORTYPE1 = 0
+FACTORTYPE2 = 0
+FACTORTYPE3 = 1
+FACTORTYPE4 = 2
+FACTORTYPE5 = 2
+FACTORTYPE6 = 3
+FACTORTYPE7 = 3
+
+//type类中。0代表整型int，1代表小数double，2代表字符串QString，3代表特殊格式例如“11，22，33”这种中间用逗号隔开的上下区间，一组上下区间需要占用两个参数位。
+//整个SMT元件的外观参数不算在参数当中（整长、整宽、角度）

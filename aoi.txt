@@ -1,0 +1,110 @@
+已知：
+QHash<QString,QString>hash;
+SMT_Info* ptr;
+
+存总表：
+所有参数都在ptr里面。通过ptr->name/code/type...访问
+
+存分表
+QString ero_type = ptr->ero_type;
+for(int i = 0;i<缺陷总数;i++)
+{
+	if(ero_type[i] != '1')
+		continue;
+	ErrorInfo* t = ptr->ero[i];
+	QString ero_name = t->name;
+	QString list_name = hash[ero_name];
+	QString res = "字串头部";
+	for(int j = 0;j < t->amount;j++)
+	{
+		switch(error_num_type[j])
+		{
+			case 0:{
+				int val = t->type0_factor[t->error_team_num[j]];
+				QString val0 = QString::number(val);
+				res += val0;
+				break;
+			}
+			case 1:{
+				double val = t->type0_factor[t->error_team_num[j]];
+				QString val0 = QString::number(val);
+				res += val0;
+				break;
+			}
+			case 2:{
+				QString val = t->type0_factor[t->error_team_num[j]];
+				res += val;
+				break;
+			}
+			case 3:{
+				QString val = t->type0_factor[t->error_team_num[j]];
+				res += val;
+				break;
+			}
+			default:
+				break;
+		}	
+	}
+	把res存入数据库
+}
+
+//取数据
+	// 读取数据库中的图片路径（QString转为std::string）
+	QString path = query.value("pic_path").toString();
+	QTextCodec* code = QTextCodec::codecForName("gb18030");
+	std::string std_path = code->fromUnicode(path).data();
+	result.pic_path = std_path;
+	result.ele_name = query.value("ele_name").toString();
+	result.b_isNG = query.value("is_ng").toInt() == 1 ? 1 : 0;
+	result.ng_trigger = query.value("ng_trigger").toString();
+	result.loc_x = query.value("loc_x").toInt();
+	result.loc_y = query.value("loc_y").toInt();
+	result.width = query.value("width").toInt();
+	result.height = query.value("height").toInt();
+
+
+
+/****************************向缺陷分表中插入信息***************************/
+ QString errorType = ptrSave->error_types;
+ int index = 0;
+ ErrorInfo* ptr = *[*ptrSave->ero+index]
+ while(ptr != nullptr)
+ {
+ QString ero_name = ptr->name;
+ QString subSheet = hash[ero_name];
+ QString subSql = "insert into `" + subSheet + "` values (";
+  //遍历要插入的参数
+  
+  
+  //
+ index++;
+ ptr = *[*ptrSave->ero+index];
+ }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

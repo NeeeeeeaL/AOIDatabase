@@ -508,7 +508,7 @@ bool JS_DATABASE::createTable(QString tableName)
 	
 }
 
-bool JS_DATABASE::matchTableIndex(QString tableName, int colIndex, QString str)
+int JS_DATABASE::matchTableIndex(QString tableName, int colIndex, QString str)
 {
 	//首先判断数据库对象是否已经连接
 	assert(is_connected); //数据库未连接时终止程序 
@@ -562,6 +562,65 @@ bool JS_DATABASE::matchTableIndex(QString tableName, int colIndex, QString str)
 		return false;
 	}
 
+}
+
+//用户登录验证
+int JS_DATABASE::usersLogin(QString userName, QString password)
+{
+	//首先判断数据库对象是否已经连接
+	assert(is_connected); //数据库未连接时终止程序 
+
+	QSqlQuery query(this->db);
+	QString sql1;
+
+	//count(*)为符合条件的记录的数量，classification为用户等级，如果用户名或密码不正确，classification = NULL
+	sql1 = "select count(*), classification from test where name = '"+ userName +"' and pwd = '" + password + "'";
+	if (query.exec(sql1))
+	{
+		query.next();
+		if (query.value(0).toInt()) //返回查询到的数量
+			return query.value(1).toInt();//返回用户等级
+		else
+			return -1;//用户名或密码错误
+	}
+	else
+		return -2; //
+
+
+}
+
+//查询时间测试
+int JS_DATABASE::timeCost()
+{
+	//首先判断数据库对象是否已经连接
+	assert(is_connected); //数据库未连接时终止程序 
+	QSqlQuery query(this->db);
+	QString sql;
+
+	//保证每次产生的随机数不一样
+	srand((unsigned)time(NULL));
+
+	clock_t startTime, endTime;
+	startTime = clock();
+	
+
+	for (int i = 0; i < 3000; ++i)
+	{
+		int id = rand() % 100000 + 1;//随机数范围[1,100000]
+		sql = "select id from test where id = '" + QString::number(id) + "'";
+
+		if (query.exec(sql))
+		{
+			query.next();
+			
+		}
+	}
+	endTime = clock();
+
+	cout << "time = " << endTime - startTime << endl;
+	
+
+	return 0;
 }
 
 
@@ -634,5 +693,175 @@ void JS_DATABASE::value_num_map_init()
 	this->value_num_map[21] = 1;
 	this->value_num_map[22] = 1;
 	this->value_num_map[23] = 1;
+}
+
+
+//向数据库存数据
+bool JS_DATABASE::saveToDB(QString eleName, SMTInfo* ptrSave, QHash<QString, QString> hash)
+{
+	//首先判断数据库对象是否已经连接
+	//数据库未连接时终止程序 
+	assert(is_connected); 
+
+	QSqlQuery query(this->db);
+
+	/**************************向总表中插入元器件信息**************************/
+	QString sql = "insert into `elements_list` values (default, ";
+	sql += "'" + ptrSave->smt_name + "', ";
+	sql += "'" + ptrSave->smt_code + "', ";
+	sql += QString::number(ptrSave->smt_length) + ", ";
+	sql += QString::number(ptrSave->smt_width) + ", ";
+	sql += QString::number(ptrSave->smt_height) + ", ";
+	sql += QString::number(ptrSave->smt_angle) + ", ";
+	sql += "'" + ptrSave->error_types + "', ";
+	sql += "'" + ptrSave->img_path + "')";
+
+	if (!query.exec(sql))
+		return false;
+	else
+		query.next();
+
+	/****************************向缺陷分表中插入信息***************************/
+	QString errorType = ptrSave->error_types;
+	int numOfError = 0;
+	for (int i = 0; i < errorType.size(); ++i)
+	{
+		if (errorType[i] == '1')
+			numOfError++;
+	}
+	int index = 0;
+	ErrorInfo* pError = *(ptrSave->ero + index);//->的优先级高于*
+
+	//当pError指向的空间没有值后结束循环
+		while (index < numOfError)
+	{
+
+		//缺陷分表
+		QString errorName = pError->name;
+		//确定要插入的分表名
+		QString subSheet = hash[errorName];
+
+		//if (pError == nullptr)
+		//	continue;
+
+		QString subSql = "insert into `" + subSheet + "` values (";
+
+		//遍历要插入的参数
+		for(int j = 0; j < pError->amount; ++j)
+		{
+			switch (pError->error_num_type[j])
+			{
+				case 0: //整型
+				{
+					int val = pError->type0_factor[pError->error_team_num[j]];
+					QString val0 = QString::number(val);
+					//判断当前是否为最后一个元素
+					if(j == pError->amount - 1)
+						subSql += val0;
+					else
+						subSql += val0 + ", ";
+					break;
+				}
+				case 1: //浮点型
+				{
+					double val = pError->type1_factor[pError->error_team_num[j]];
+					QString val1 = QString::number(val);
+					//判断当前是否为最后一个元素
+					if (j == pError->amount - 1)
+						subSql += val1;
+					else
+						subSql += val1 + ", ";
+					break;
+				}
+				case 2: //QString
+				{
+					QString val = pError->type2_factor[pError->error_team_num[j]];
+					//判断当前是否为最后一个元素
+					if (j == pError->amount - 1)
+						subSql += "'" + val + "'";
+					else
+						subSql += "'" + val + "', ";
+					break;
+				}
+				case 3: //QString
+				{
+					QString val = pError->type3_factor[pError->error_team_num[j]];
+					//判断当前是否为最后一个元素
+					if (j == pError->amount - 1)
+						subSql += "'" + val + "'";
+					else
+						subSql += "'" + val + "', ";
+					break;
+				}
+				default:
+					break;
+			}
+				
+		}
+
+		subSql += ")";
+		if (!query.exec(subSql))
+			return false;
+		else
+			query.next();
+	
+		index++;
+		pError = *(ptrSave->ero + index);
+	}
+	
+	cout << "写入完成！" << endl;
+
+}
+
+//从数据库中取数据
+bool JS_DATABASE::loadFromDB(QString eleName, SMTInfo* ptrLoad, QHash<QString, QString> hash)
+{
+	//首先判断数据库对象是否已经连接
+	//数据库未连接时终止程序 
+	assert(is_connected);
+
+	QSqlQuery query(this->db);
+
+	/**************************从总表中读取元器件信息**************************/
+	QString sql = "select * from `elements_list` where ele_name = '" + eleName + "'";
+
+	if (!query.exec(sql))
+		return false;
+	else
+		query.next();
+
+	ptrLoad->smt_name = query.value("ele_name").toString();
+	ptrLoad->smt_code = query.value("ele_index").toString();
+	ptrLoad->smt_length = query.value("ele_length").toInt();
+	ptrLoad->smt_width = query.value("ele_width").toInt();
+	ptrLoad->smt_height = query.value("ele_height").toInt();
+	ptrLoad->smt_angle = query.value("ele_angel").toInt();
+	ptrLoad->error_types = query.value("ng_trigger").toString();
+	ptrLoad->img_path = query.value("pic_path").toString();
+
+	/****************************从缺陷分表中读取信息***************************/
+	QString errorType = ptrLoad->error_types;
+	for (int i = 0; i < errorType.size(); ++i)
+	{
+		if (errorType[i] != '1')
+			continue;
+
+		//pError指向第i张数据表
+		ErrorInfo* pError = ptrLoad->ero[i];
+
+		//TODO:应建立一个存储缺陷分表的vector
+		//QString subSheet = 
+		if (pError == nullptr)
+			continue;
+		
+		////查询缺陷分表中有多少个字段
+		//QString subSql = "select count(*) from information_schema.columns where table_name = '" + ;
+		//pError->amount = ;
+
+		//for (int j = 0; j < pError->amount; ++j)
+		//{
+		//	switch()
+		//}
+	}
 }
 
