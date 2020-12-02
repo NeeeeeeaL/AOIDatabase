@@ -100,41 +100,43 @@ int main(int argc, char *argv[])
 	}
 	
 	/*************************************saveToDB()函数测试***********************************/
-	SMTInfo* boardInfo = new SMTInfo();
-	boardInfo->smt_name = "TestBoard1127";
-	boardInfo->smt_code = "test1127";
-	boardInfo->smt_length = 1235;
-	boardInfo->smt_width = 165;
-	boardInfo->smt_height = 4571;
-	boardInfo->smt_angle = 6471;
-	boardInfo->error_types = "1";
-	boardInfo->img_path = "D:\\\\test\\\\pic\\\\test.bmp";
+	//SMTInfo* boardInfo = new SMTInfo();
+	//boardInfo->smt_name = "TestBoard1127";
+	//boardInfo->smt_code = "test1127";
+	//boardInfo->smt_length = 1235;
+	//boardInfo->smt_width = 165;
+	//boardInfo->smt_height = 4571;
+	//boardInfo->smt_angle = 6471;
+	//boardInfo->error_types = "1";
+	//boardInfo->img_path = "D:\\\\test\\\\pic\\\\test.bmp";
 
-	ErrorInfo* ero = new ErrorInfo();
-	boardInfo->ero = &ero;
-	boardInfo->ero[0]->Reset_this();//初始化重置
-	boardInfo->ero[0]->amount = 5;//第一张缺陷分表(ero[0])有5个参数
-	boardInfo->ero[0]->error_num_type = {0, 0, 1, 3, 3};
-	boardInfo->ero[0]->error_team_num = { 0, 1, 0, 0, 1 };
-	boardInfo->ero[0]->name = QString::fromLocal8Bit("电极末端突出");
-	boardInfo->ero[0]->type0_factor = {50, 70};
-	boardInfo->ero[0]->type1_factor = { 32.7 };
-	boardInfo->ero[0]->type2_factor = { "upper, boundary" };
-	boardInfo->ero[0]->type3_factor = { "x, y",  "hello, world!"};
+	//ErrorInfo* ero = new ErrorInfo();
+	//boardInfo->ero = &ero;
+	//boardInfo->ero[0]->Reset_this();//初始化重置
+	//boardInfo->ero[0]->amount = 5;//第一张缺陷分表(ero[0])有5个参数
+	//boardInfo->ero[0]->error_num_type = {0, 0, 1, 3, 3};
+	//boardInfo->ero[0]->error_team_num = { 0, 1, 0, 0, 1 };
+	//boardInfo->ero[0]->name = QString::fromLocal8Bit("电极末端突出");
+	//boardInfo->ero[0]->type0_factor = {50, 70};
+	//boardInfo->ero[0]->type1_factor = { 32.7 };
+	//boardInfo->ero[0]->type2_factor = { "upper, boundary" };
+	//boardInfo->ero[0]->type3_factor = { "x, y",  "hello, world!"};
 
-	QHash<QString, QString> hashList;
-	hashList.insert(QString::fromLocal8Bit("电极末端突出"), "1_op_ending_extrude");
-
-	bool insertData = aoi_db.saveToDB("testBoard", boardInfo, hashList);
-	cout << "insertData = " << insertData << endl;
-	delete boardInfo;
-	delete ero;
-
-	/*************************************loadFromDB()函数测试***********************************/
-	//SMTInfo* loadInfo = new SMTInfo();
 	//QHash<QString, QString> hashList;
 	//hashList.insert(QString::fromLocal8Bit("电极末端突出"), "1_op_ending_extrude");
-	//bool loadData = aoi_db.loadFromDB("test", loadInfo, hashList);
+
+	//bool insertData = aoi_db.saveToDB("testBoard", boardInfo, hashList);
+	//cout << "insertData = " << insertData << endl;
+	//delete boardInfo;
+	//delete ero;
+
+	/*************************************loadFromDB()函数测试***********************************/
+	SMTInfo* loadInfo = new SMTInfo();
+	loadInfo->ero = new ErrorInfo*[27];
+	//ErrorInfo* ero = new ErrorInfo();
+	//loadInfo->ero = &ero;
+	std::vector<QStringList>res;
+	bool loadData = aoi_db.loadFromDB("test", loadInfo,res);
 
     return a.exec();
 }

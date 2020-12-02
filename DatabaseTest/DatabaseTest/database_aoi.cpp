@@ -640,30 +640,33 @@ QString JS_DATABASE::get_timestamp_now()
 // 检测算子对应表名的索引map初始化
 void JS_DATABASE::defect_index_map_init()
 {
-	this->defect_index_map[0] = "op_ending_extrude";				// 末端突出
-	this->defect_index_map[1] = "op_wrong_element";					// 错料
-	this->defect_index_map[2] = "op_backwards";						// 装反
-	this->defect_index_map[3] = "op_ending_overlap";				// 末端重叠
-	this->defect_index_map[4] = "op_missing_element";				// 缺件
-	this->defect_index_map[5] = "op_electrode_area";				// 电极面积
-	this->defect_index_map[6] = "op_polarity_error";				// 极性错误
-	this->defect_index_map[7] = "op_electrode_lateral_bending";		// 电极横向弯曲
-	this->defect_index_map[8] = "op_element_offset";				// 元件偏移
-	this->defect_index_map[9] = "op_broadside_extrude";				// 侧边突出
-	this->defect_index_map[10] = "op_electrode_extrude";			// 电极突出
-	this->defect_index_map[11] = "op_pad_infiltration";				// 焊盘浸润
-	this->defect_index_map[12] = "op12";
-	this->defect_index_map[13] = "op13";
-	this->defect_index_map[14] = "op14";
-	this->defect_index_map[15] = "op15";
-	this->defect_index_map[16] = "op16";
-	this->defect_index_map[17] = "op17";
-	this->defect_index_map[18] = "op18";
-	this->defect_index_map[19] = "op19";
-	this->defect_index_map[20] = "op20";
-	this->defect_index_map[21] = "op21";
-	this->defect_index_map[22] = "op22";
-	this->defect_index_map[23] = "op23";
+	this->defect_index_map[0] = "1_op_ending_extrude";				    // 末端突出
+	this->defect_index_map[1] = "2_op_wrong_element";					// 错料
+	this->defect_index_map[2] = "3_op_backwards";						// 装反
+	this->defect_index_map[3] = "4_op_ending_overlap";				    // 末端重叠
+	this->defect_index_map[4] = "5_op_missing_element";				    // 缺件
+	this->defect_index_map[5] = "6_op_electrode_area";				    // 电极面积
+	this->defect_index_map[6] = "7_op_polarity_error";				    // 极性错误
+	this->defect_index_map[7] = "8_op_electrode_lateral_bending";		// 电极横向弯曲
+	this->defect_index_map[8] = "9_op_element_offset";				    // 元件偏移
+	this->defect_index_map[9] = "10_op_broadside_extrude";				// 侧边突出
+	this->defect_index_map[10] = "11_op_electrode_extrude";			    // 电极突出
+	this->defect_index_map[11] = "12_op_pad_infiltration";				// 焊盘浸润
+	this->defect_index_map[12] = "13_op_tin_width";                     // 填锡末端接合宽度
+	this->defect_index_map[13] = "14_op_electrode_exists_or_not";       // 电极有无
+	this->defect_index_map[14] = "15_op_pad_copper_leakage";            // 焊盘漏铜
+	this->defect_index_map[15] = "16_op_pad_abnormal";                  // 焊盘异常
+	this->defect_index_map[16] = "17_op_fill_tin_length";               // 填锡长度
+	this->defect_index_map[17] = "18_op_electrode_up_copper_leakage";   // 电极顶端漏铜
+	this->defect_index_map[18] = "19_op_electrode_infiltration";        // 电极浸润
+	this->defect_index_map[19] = "20_op_ele_height";                    // 元件高度
+	this->defect_index_map[20] = "21_op_electrode_bridge";              // 电极桥接
+	this->defect_index_map[21] = "22_op_electrode_uneven";              // 电极不平
+	this->defect_index_map[22] = "23_op_tin_height";                    // 填锡高度
+	this->defect_index_map[23] = "24_op_pad_something";                 // 焊盘异物
+	this->defect_index_map[24] = "25_op_tin_ball";                      // 锡珠
+	this->defect_index_map[25] = "26_op_something";                     // 异物
+	this->defect_index_map[26] = "27_op_electrode_raise";               // 元件起翘
 }
 
 // 检测算子对应输出值数量的map初始化
@@ -814,7 +817,7 @@ bool JS_DATABASE::saveToDB(QString eleName, SMTInfo* ptrSave, QHash<QString, QSt
 }
 
 //从数据库中取数据
-bool JS_DATABASE::loadFromDB(QString eleName, SMTInfo* ptrLoad, QHash<QString, QString> hash)
+bool JS_DATABASE::loadFromDB(QString eleName, SMTInfo* ptrLoad,std::vector<QStringList>&res)
 {
 	//首先判断数据库对象是否已经连接
 	//数据库未连接时终止程序 
@@ -847,21 +850,44 @@ bool JS_DATABASE::loadFromDB(QString eleName, SMTInfo* ptrLoad, QHash<QString, Q
 			continue;
 
 		//pError指向第i张数据表
+		ptrLoad->ero[i] = new ErrorInfo;
 		ErrorInfo* pError = ptrLoad->ero[i];
-
-		//TODO:应建立一个存储缺陷分表的vector
-		//QString subSheet = 
+		
+		QString subSheet = this->defect_index_map[i];
 		if (pError == nullptr)
 			continue;
 		
-		////查询缺陷分表中有多少个字段
-		//QString subSql = "select count(*) from information_schema.columns where table_name = '" + ;
-		//pError->amount = ;
+		//查询缺陷分表中有多少个字段
+		QString SqlNum = "select count(*) from information_schema.columns where table_name = '" + subSheet + "'";
+		if (!query.exec(SqlNum))
+			return false;
+		else
+			query.next();
+		pError->amount = query.value(0).toInt() - 1;
 
-		//for (int j = 0; j < pError->amount; ++j)
-		//{
-		//	switch()
-		//}
+		////查询各字段类型
+		//QString SqlType = "select data_type from information_schema.columns where table_name = '" + subSheet + "'";
+		//if (!query.exec(SqlType))
+		//	return false;
+		//else
+		//	query.next();
+		
+		QStringList dataList;
+		//查询一行所有数据
+		QString SqlAll = "select * from `" + subSheet + "` where ele_name = '" + eleName + "'";
+		if (!query.exec(SqlAll))
+			return false;
+		else
+			query.next();
+		QStringList m_list;
+		for (int i = 1; i < pError->amount + 1;i++)
+		{
+			m_list << query.value(i).toString();
+			qDebug() << query.value(i);
+		}
+		res.push_back(m_list);
+
+
 	}
 }
 

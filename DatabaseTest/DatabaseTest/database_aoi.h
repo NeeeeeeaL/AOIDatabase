@@ -98,7 +98,7 @@ public:
 	//向数据库存数据
 	bool saveToDB(QString, SMTInfo*, QHash<QString, QString>);
 	//从数据库中取数据
-	bool loadFromDB(QString, SMTInfo*, QHash<QString, QString>);
+	bool loadFromDB(QString, SMTInfo*, std::vector<QStringList>&res);
 
 
 
@@ -156,6 +156,7 @@ struct ErrorInfo
 {
 	int amount; //缺陷参数个数
 	QString name; //缺陷名（中文）
+	QString dbName; //缺陷名（英文）
 	std::vector<int>error_team_num;//参数在各自数组中的序号
 	std::vector<QString>error_name;//参数名
 	std::vector<int>error_num_type;//将数据表参数类型按参数在数据表中的顺序存储在vector中
